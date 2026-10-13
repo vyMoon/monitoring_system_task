@@ -1,4 +1,4 @@
-from alarm.alarm import Alarm
+from alarm import Alarm
 
 a = Alarm()
 

@@ -1,4 +1,4 @@
-from menu.menu import Menu
+from menu import Menu
 
 # Menu
 # startar alarm skapande dialog
