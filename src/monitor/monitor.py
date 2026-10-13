@@ -11,6 +11,7 @@
 # loggar och printar med hjälp av logger
 # Larm.check -> true \ false
 # if larm true -> print och log error
+# __str__, __ len__ methods
 
 class Monitor:
   pass
