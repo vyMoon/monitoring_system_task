@@ -1,8 +1,15 @@
 # Menu
 # startar alarm skapande dialog
-# Startar monitor
-# avslutar monitors arbete (ctrl c)
-# handlar errors
+# options - add alarm, remove alarm, start monitor
+# m = Monitor(Alarm(type, target), Alarm(type, target), Alarm(type, target))
+# m.start(), m.stop()
+# Startar monitor -> m.start()
+# avslutar monitors arbete (ctrl c) -> m.stop()
+# try:
+#   m.start()
+# except KeyboardInteruption:
+#   m.stop() 
+# handlar errors ?
 
 class Menu:
   def check(elf):
