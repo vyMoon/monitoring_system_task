@@ -1,12 +1,21 @@
+import argparse
+
 from menu import Menu
 
-# Menu
-# startar alarm skapande dialog
-# Startar monitor
-# avslutar monitors arbete (ctrl c)
-# handlar errors
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "startup_choices",
+        nargs="*",
+        help=(
+            "Menyval och svar på efterföljande frågor i ordning, "
+            "till exempel: 1 cpu 80 3 5"
+        ),
+    )
+    args = parser.parse_args()
+    Menu().check(args.startup_choices)
 
 
-m = Menu()
-
-m.check()
+if __name__ == "__main__":
+    main()
