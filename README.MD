@@ -34,9 +34,9 @@ Run the program from the project root directory:
 
     python index.py
 
-The program stores configured alarms in `alarms.json` in the project root.
-The same JSON file can be read by the monitoring system. It contains an array
-of objects with a `type` and a numeric `target`.
+The program stores configured alarms in `alarms.txt` in the project root.
+Each line contains an alarm type and its numeric target, separated by a space,
+for example: `cpu 80`.
 
 Menu choices and answers to their prompts can be provided as command-line
 arguments in order at startup. For example, this adds a disk alarm at level 40,

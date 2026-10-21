@@ -1,11 +1,10 @@
-import json
 from pathlib import Path
 
 from alarm import Alarm
 
 
 class Menu:
-    STORAGE_PATH = Path(__file__).resolve().parents[2] / "alarms.json"
+    STORAGE_PATH = Path(__file__).resolve().parents[2] / "alarms.txt"
 
     def __init__(self, storage_path=None):
         self.storage_path = Path(storage_path or self.STORAGE_PATH)
@@ -105,23 +104,34 @@ class Menu:
         if not self.storage_path.exists():
             return []
 
-        alarm_data = json.loads(self.storage_path.read_text(encoding="utf-8"))
-        if not isinstance(alarm_data, list):
-            raise ValueError("Alarmfilen måste innehålla en JSON-lista.")
-
         alarms = []
-        for item in alarm_data:
-            if not isinstance(item, dict) or "type" not in item or "target" not in item:
-                raise ValueError("Varje alarm måste innehålla 'type' och 'target'.")
-            alarms.append(Alarm(item["type"], item["target"]))
+        for line_number, line in enumerate(
+            self.storage_path.read_text(encoding="utf-8").splitlines(),
+            start=1,
+        ):
+            fields = line.split()
+            if not fields:
+                continue
+            if len(fields) != 2:
+                raise ValueError(
+                    f"Ogiltigt format på rad {line_number} i alarmfilen."
+                )
+
+            alarm_type, target_input = fields
+            try:
+                try:
+                    target = int(target_input)
+                except ValueError:
+                    target = float(target_input)
+                alarms.append(Alarm(alarm_type, target))
+            except ValueError as error:
+                raise ValueError(
+                    f"Ogiltigt alarm på rad {line_number} i alarmfilen: {error}"
+                ) from error
         return alarms
 
     def _save_alarms(self):
-        alarm_data = [
-            {"type": alarm.type, "target": alarm.target}
-            for alarm in self.alarms
-        ]
         self.storage_path.write_text(
-            json.dumps(alarm_data, ensure_ascii=False, indent=2) + "\n",
+            "".join(f"{alarm.type} {alarm.target}\n" for alarm in self.alarms),
             encoding="utf-8",
         )
