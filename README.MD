@@ -30,5 +30,19 @@ If the command runs without errors, the `Alarm` class can be imported successful
 
 ## 5. Run the Project
 
-Run the required Python file from the project root directory.
+Run the program from the project root directory:
 
+    python index.py
+
+The program stores configured alarms in `alarms.json` in the project root.
+The same JSON file can be read by the monitoring system. It contains an array
+of objects with a `type` and a numeric `target`.
+
+Menu choices can be provided as command-line arguments to run them in order at
+startup. For example, this lists the configured alarms and then exits:
+
+    python index.py 3 5
+
+If the sequence does not include choice `5`, the interactive menu continues
+after the startup choices have been run. Adding an alarm still prompts for its
+category and level.
