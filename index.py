@@ -5,8 +5,9 @@ from menu import Menu
 # Startar monitor
 # avslutar monitors arbete (ctrl c)
 # handlar errors
-
+# source .venv/bin/activate.fish
 
 m = Menu()
 
-m.check()
+#m.check()
+m.start()

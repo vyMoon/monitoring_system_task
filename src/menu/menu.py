@@ -12,5 +12,9 @@
 # handlar errors ?
 
 class Menu:
-  def check(elf):
+  def check(self):
     print('menu')
+  
+  def start(self):
+    print("Starting menu...")
+
