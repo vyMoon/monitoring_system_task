@@ -1,7 +1,7 @@
 import math
 import re
 
-alarm_types = ("cpu", "ram", "disk")
+alarm_types = ("cpu", "ram", "disk") 
 
 # Class Alarm
 # used in monitor class in order to check if the level of usage is more than the target
