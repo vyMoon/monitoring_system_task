@@ -14,3 +14,6 @@
 class Menu:
   def check(elf):
     print('menu')
+
+  def start(self):
+    print('start menu')
