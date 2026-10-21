@@ -30,7 +30,7 @@ class MenuTests(unittest.TestCase):
         output = StringIO()
 
         with patch("builtins.input", return_value="2"), redirect_stdout(output):
-            menu.check(["3", "2", "4", "5"])
+            menu.check(["3", "2", "2", "4", "5"])
 
         displayed = output.getvalue()
         self.assertLess(displayed.index("1. Alarm - type: cpu, target: 20"),
@@ -55,8 +55,20 @@ class MenuTests(unittest.TestCase):
     def test_adding_alarm_and_exiting_saves_it(self):
         menu = Menu(self.storage_path)
 
-        with patch("builtins.input", side_effect=["disk", "40"]), redirect_stdout(StringIO()):
-            menu.check(["1", "5"])
+        with patch("builtins.input", side_effect=AssertionError("Unexpected interactive input")):
+            with redirect_stdout(StringIO()):
+                menu.check(["1", "disk", "40", "5"])
+
+        self.assertEqual(
+            json.loads(self.storage_path.read_text(encoding="utf-8")),
+            [{"type": "disk", "target": 40}],
+        )
+
+    def test_startup_choices_can_answer_all_prompts_without_input(self):
+        menu = Menu(self.storage_path)
+
+        with patch("builtins.input", side_effect=AssertionError("Unexpected interactive input")):
+            menu.check(["1", "disk", "40", "3", "5"])
 
         self.assertEqual(
             json.loads(self.storage_path.read_text(encoding="utf-8")),

@@ -38,11 +38,12 @@ The program stores configured alarms in `alarms.json` in the project root.
 The same JSON file can be read by the monitoring system. It contains an array
 of objects with a `type` and a numeric `target`.
 
-Menu choices can be provided as command-line arguments to run them in order at
-startup. For example, this lists the configured alarms and then exits:
+Menu choices and answers to their prompts can be provided as command-line
+arguments in order at startup. For example, this adds a disk alarm at level 40,
+lists the configured alarms, and exits without interactive input:
 
-    python index.py 3 5
+    python index.py 1 disk 40 3 5
 
-If the sequence does not include choice `5`, the interactive menu continues
-after the startup choices have been run. Adding an alarm still prompts for its
-category and level.
+If the sequence does not include choice `5`, or does not provide all answers
+required by its menu choices, the program continues interactively after using
+the supplied arguments.

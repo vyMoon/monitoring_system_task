@@ -12,14 +12,11 @@ class Menu:
         self.alarms = self._load_alarms()
 
     def check(self, startup_choices=None):
-        startup_choices = iter(startup_choices or [])
+        self._startup_choices = iter(startup_choices or [])
 
         while True:
             self._print_menu()
-            try:
-                choice = next(startup_choices)
-            except StopIteration:
-                choice = input("Välj ett alternativ: ").strip()
+            choice = self._read_input("Välj ett alternativ: ")
 
             if choice == "1":
                 self._add_alarm()
@@ -47,9 +44,15 @@ class Menu:
             "5. Avsluta Larm-konfigurationssystem program"
         )
 
+    def _read_input(self, prompt):
+        try:
+            return next(self._startup_choices).strip()
+        except StopIteration:
+            return input(prompt).strip()
+
     def _add_alarm(self):
-        alarm_type = input("Ange kategori (cpu, ram eller disk): ").strip()
-        target_input = input("Ange nivå (0-100): ").strip()
+        alarm_type = self._read_input("Ange kategori (cpu, ram eller disk): ")
+        target_input = self._read_input("Ange nivå (0-100): ")
 
         try:
             target = float(target_input) if "." in target_input else int(target_input)
@@ -68,7 +71,7 @@ class Menu:
             return
 
         self._print_alarms(sorted_alarms)
-        index_input = input("Ange numret på alarmet som ska tas bort: ").strip()
+        index_input = self._read_input("Ange numret på alarmet som ska tas bort: ")
         try:
             index = int(index_input) - 1
         except ValueError:

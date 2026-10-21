@@ -8,8 +8,10 @@ def main():
     parser.add_argument(
         "startup_choices",
         nargs="*",
-        choices=("1", "2", "3", "4", "5"),
-        help="Menyval som ska köras vid start, till exempel: 3 5",
+        help=(
+            "Menyval och svar på efterföljande frågor i ordning, "
+            "till exempel: 1 cpu 80 3 5"
+        ),
     )
     args = parser.parse_args()
     Menu().check(args.startup_choices)
