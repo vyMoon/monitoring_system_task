@@ -1,3 +1,4 @@
+import sys
 # Menu
 # startar alarm skapande dialog
 # options - add alarm, remove alarm, start monitor
@@ -12,8 +13,49 @@
 # handlar errors ?
 
 class Menu:
-  def check(elf):
+  def check(self):
     print('menu')
+  
+  def __init__(self):
+    self.args = sys.argv[1:]
+    
+  def run_args(self):
+    # Make code to handle arguments
+    # Check if arugments are valid
+    try:
+        if len(self.args) != 3:
+          raise ValueError(f"Expected 3 arguments, got {len(self.args)}")
+
+        # Convert and validate every argument (must be an integer 1-3)
+        values = []
+        for i, arg in enumerate(self.args[:3]):
+            try:
+                number = int(arg)
+            except ValueError:
+                raise ValueError(f"Argument {i + 1} ('{arg}') is not a number")
+            if number not in (1, 2, 3):
+                raise ValueError(f"Argument {i + 1} is {number}, must be 1-3")
+            values.append(number)
+
+        if values[0] == 1:
+            # Start monitor
+            pass
+        if values[1] == 2:
+            # Choose alarm to monitor (cpu, ram, disk)
+            pass
+        if values[2] == 3:
+            # Choose monitor limit percentage
+            print("works here")
+
+    except ValueError as e:
+        print(f"Invalid arguments: {e}")
 
   def start(self):
-    print('start menu')
+    if len(self.args) > 0:
+      self.run_args()
+    else:
+      # Run a menu that shows options or do something else instead?
+      print("No arguments provided, running menu")
+
+
+
