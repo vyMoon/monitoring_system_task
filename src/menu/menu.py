@@ -49,13 +49,17 @@ class Menu:
 
     except ValueError as e:
         print(f"Invalid arguments: {e}")
+    
+  def run(self):
+    # Run standard menu if no arguments are provided
+    print("Running menu here since no arguments were provided")
 
   def start(self):
     if len(self.args) > 0:
       self.run_args()
     else:
       # Run a menu that shows options or do something else instead?
-      print("No arguments provided, running menu")
+      self.run()
 
 
 
