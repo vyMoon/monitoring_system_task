@@ -4,6 +4,9 @@ from pathlib import Path
 class Logger:
   # folder name for log files
   logsFolderName = 'logs'
+  prefixMessage = '{prefix}: {message}'
+  warnPrefix = 'WARN'
+  alarmPrefix = 'ALARM'
 
   def __init__(self, path: Path):
     self.createLogFile(path)
@@ -28,16 +31,16 @@ class Logger:
   # log with prefix. line info looks like WARN: cpu current = 80, limit = 85
   def logPrefix(self, prefix: str, message: str):
     self.log(
-      f'{prefix}: {message}'
+      self.prefixMessage.format(prefix = prefix, message = message)
     )
 
   # logs with warn prefix
   def warn(self, message: str):
-    self.logPrefix('WARN', message)
+    self.logPrefix(self.warnPrefix, message)
 
   # logs with alarm prefix
   def alarm(self, message: str):
-    self.logPrefix('ALARM', message)
+    self.logPrefix(self.alarmPrefix, message)
 
 
 # l = Logger(Path.cwd())
