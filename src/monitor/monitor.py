@@ -1,6 +1,7 @@
 import sys
 import psutil
 import itertools
+import time
 from pathlib import Path
 from alarm.alarm import Alarm
 from logger.logger import Logger
@@ -14,6 +15,7 @@ type SystemState = dict[AlarmType, ParameterState]
 class Monitor:
   # the set of symbols that are shown in the console during monitoring
   spinner = itertools.cycle(['.' * i for i in range(1, 7)])
+  logStr = '{alarmType} - current: {state}, limit: {limit}'
 
   def __init__(
       self,
@@ -32,12 +34,16 @@ class Monitor:
     self.monitor_interval = monitor_interval
     self.warn_level = warn_level
     self.alarm_level = alarm_level
+    # this is a dictionary with alarm type keys adn state get fns
+    # it is used on monitoring stage for creating system state
+    # while iterating throw alarms corresponding method is run
     self.getStateFn: dict[AlarmType, Callable[[], float]] = {
       'cpu': self.getCpu,
       'ram': self.getRam,
       'disk': self.getDisk,
     }
     self.getAlarms()
+    self.hasCpuAlarm = self.checkCpuAlarm()
 
   # check alarms file and get alarms
   def getAlarms(self):
@@ -51,7 +57,9 @@ class Monitor:
   def checkCpuAlarm(self):
     for alarm in self.alarms:
       if alarm.type == 'cpu':
-        self.hasCpu = True
+        return True
+    return False
+  
   # takes monitoring time in seconds, if not provided permanent monitor
   def startMonitor(self, seconds: int = None):
     if seconds:
@@ -61,6 +69,10 @@ class Monitor:
     while now <= end if seconds else True:
       self.runSpinner()
       self.monitorSystem()
+      # cpu demands time. the time 1 sec by default. if cpu alarm is not set
+      # this makes the loop slower
+      if not self.hasCpuAlarm:
+        time.sleep(1)
       now = datetime.now()
 
   # gather information about the system and log it
@@ -107,7 +119,7 @@ class Monitor:
 
   # returns correct information string for logging 
   def getLogStr(self, alarmType: str, state: int | float, limit: int | float) -> str:
-    return f'{alarmType} - current: {state}, limit: {limit}'
+    return self.logStr.format(alarmType=alarmType, state=state, limit=limit)
 
   # returns current cpu state
   def getCpu(self) -> float:
