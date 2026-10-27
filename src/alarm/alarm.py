@@ -1,6 +1,7 @@
+import math
 import re
 
-alarm_types = ("cpu", "ram" "disk") 
+alarm_types = ("cpu", "ram", "disk") 
 
 # Class Alarm
 # used in monitor class in order to check if the level of usage is more than the target
@@ -76,5 +77,5 @@ class Alarm:
   # check the type and value of provided target
   def checkTarget(self, target):
     self.validateTargetType(target)
-    if target > 100:
-      raise ValueError('Target must be more than 0 and not more than 100')
+    if target < 0 or target > 100 or not math.isfinite(target):
+      raise ValueError('Target must be between 0 and 100')
