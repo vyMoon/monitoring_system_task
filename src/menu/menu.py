@@ -1,4 +1,18 @@
 import sys
+
+# Ren funktion: returnerar en sorterad lista utan att ändra originalet.
+# Lambda ger sorted en sorteringsnyckel; därför är sorted en högre ordningens funktion här.
+def sort_alarms(alarms):
+  return sorted(alarms, key=lambda alarm: (alarm.type, alarm.target))
+
+
+# Ren funktion: omvandlar alarmvärden till text utan utskrift eller ändring av indata.
+def format_alarms(alarms: tuple[tuple[str, int | float], ...]) -> str:
+  return "\n".join(
+    f"{index}. Alarm - type: {alarm_type}, target: {target}"
+    for index, (alarm_type, target) in enumerate(alarms, start=1)
+  )
+
 # Menu
 # startar alarm skapande dialog
 # options - add alarm, remove alarm, start monitor
@@ -134,10 +148,7 @@ class Menu:
     print(f"Alarm tillagt: {alarm}")
 
   def remove_alarm(self):
-    sorted_alarms = sorted(
-      self.alarms,
-      key=lambda alarm: (alarm.type, alarm.target),
-    )
+    sorted_alarms = sort_alarms(self.alarms)
     if not sorted_alarms:
       print("Det finns inga konfigurerade alarm att ta bort.")
       return
@@ -158,10 +169,7 @@ class Menu:
     print(f"Alarm borttaget: {alarm}")
 
   def list_alarms(self):
-    sorted_alarms = sorted(
-      self.alarms,
-      key=lambda alarm: (alarm.type, alarm.target),
-    )
+    sorted_alarms = sort_alarms(self.alarms)
     if not sorted_alarms:
       print("Det finns inga konfigurerade alarm.")
       return
@@ -169,8 +177,8 @@ class Menu:
     self._print_alarms(sorted_alarms)
 
   def _print_alarms(self, alarms):
-    for index, alarm in enumerate(alarms, start=1):
-      print(f"{index}. {alarm}")
+    alarm_values = tuple((alarm.type, alarm.target) for alarm in alarms)
+    print(format_alarms(alarm_values))
 
   def save_alarms(self):
     alarm_file = self._alarm_file_path()
