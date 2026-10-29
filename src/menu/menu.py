@@ -6,6 +6,7 @@ def sort_alarms(alarms):
   return sorted(alarms, key=lambda alarm: (alarm.type, alarm.target))
 
 
+# Christians kompletteringsdel
 # Ren funktion: omvandlar alarmvärden till text utan utskrift eller ändring av indata.
 def format_alarms(alarms: tuple[tuple[str, int | float], ...]) -> str:
   return "\n".join(
