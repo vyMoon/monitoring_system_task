@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from menu import Menu
+from menu.menu import format_alarms
 
 
 class MenuTests(unittest.TestCase):
@@ -19,6 +20,20 @@ class MenuTests(unittest.TestCase):
 
     def tearDown(self):
         self.temp_dir.cleanup()
+
+    def test_format_alarms_returns_text_without_changing_input(self):
+        alarm_values = (("cpu", 80), ("disk", 40))
+
+        first_result = format_alarms(alarm_values)
+        second_result = format_alarms(alarm_values)
+
+        self.assertEqual(
+            first_result,
+            "1. Alarm - type: cpu, target: 80\n"
+            "2. Alarm - type: disk, target: 40",
+        )
+        self.assertEqual(second_result, first_result)
+        self.assertEqual(alarm_values, (("cpu", 80), ("disk", 40)))
 
     def test_startup_sequence_adds_lists_and_saves_alarm(self):
         self.menu.args = ["1", "disk", "40", "3", "5"]
