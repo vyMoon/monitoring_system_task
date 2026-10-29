@@ -1,3 +1,10 @@
+# Team Contributions
+
+    Jacqueline Cummings - Alarm class
+    Christian Arroyo
+    Julian Carlos Miguel Gacusan Agonoy
+    Aleksei Popov - Monitor, Logger classes
+
 # Project Setup and Installation
 
 ## 1. Clone the Repository
