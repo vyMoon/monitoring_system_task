@@ -2,6 +2,21 @@ import sys
 from pathlib import Path
 from logger.logger import Logger
 from monitor.monitor import Monitor
+
+# Ren funktion: returnerar en sorterad lista utan att ändra originalet.
+# Lambda ger sorted en sorteringsnyckel; därför är sorted en högre ordningens funktion här.
+def sort_alarms(alarms):
+  return sorted(alarms, key=lambda alarm: (alarm.type, alarm.target))
+
+
+# Christians kompletteringsdel
+# Ren funktion: omvandlar alarmvärden till text utan utskrift eller ändring av indata.
+def format_alarms(alarms: tuple[tuple[str, int | float], ...]) -> str:
+  return "\n".join(
+    f"{index}. Alarm - type: {alarm_type}, target: {target}"
+    for index, (alarm_type, target) in enumerate(alarms, start=1)
+  )
+
 # Menu
 # startar alarm skapande dialog
 # options - add alarm, remove alarm, start monitor
@@ -160,10 +175,7 @@ class Menu:
 
   def remove_alarm(self):
     self.log('alarm removal started')
-    sorted_alarms = sorted(
-      self.alarms,
-      key=lambda alarm: (alarm.type, alarm.target),
-    )
+    sorted_alarms = sort_alarms(self.alarms)
     if not sorted_alarms:
       print("Det finns inga konfigurerade alarm att ta bort.")
       self.log('there is no alarm in the system')
@@ -188,10 +200,7 @@ class Menu:
     print(f"Alarm borttaget: {alarm}")
 
   def list_alarms(self):
-    sorted_alarms = sorted(
-      self.alarms,
-      key=lambda alarm: (alarm.type, alarm.target),
-    )
+    sorted_alarms = sort_alarms(self.alarms)
     if not sorted_alarms:
       print("Det finns inga konfigurerade alarm.")
       return
@@ -200,9 +209,10 @@ class Menu:
 
   def _print_alarms(self, alarms):
     self.log('existing alarms')
-    for index, alarm in enumerate(alarms, start=1):
-      print(f"{index}. {alarm}")
-      self.log(f"{index}. {alarm}")
+    alarm_values = tuple((alarm.type, alarm.target) for alarm in alarms)
+    alarms_to_print = format_alarms(alarm_values)
+    print(alarms_to_print)
+    self.log(alarms_to_print)
 
   def save_alarms(self):
     self.log('alarm preservation')
