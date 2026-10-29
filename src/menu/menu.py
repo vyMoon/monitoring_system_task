@@ -1,4 +1,7 @@
 import sys
+from pathlib import Path
+from logger.logger import Logger
+from monitor.monitor import Monitor
 # Menu
 # startar alarm skapande dialog
 # options - add alarm, remove alarm, start monitor
@@ -13,11 +16,23 @@ import sys
 # handlar errors ?
 
 class Menu:
+  """prefix for logging"""
+  prefix = 'Menu'
+
   def check(self):
     print('menu')
   
   def __init__(self):
     self.args = sys.argv[1:]
+    self.logger = self.get_logger()
+
+  """creates and returns logger"""
+  def get_logger(self) -> Logger:
+    return Logger(Path.cwd())
+
+  """send the information to logger with menu prefix"""
+  def log(self, message: str):
+    self.logger.logPrefix(self.prefix, message)
 
   def run_args(self):
     # Make code to handle arguments
@@ -67,8 +82,9 @@ class Menu:
       "3": ("Lista alla konfigurerade alarm", "list_alarms"),
       "4": (
         "Skicka konfigurerade alarm till Monitoreringssystem",
-        "save_alarms",
+        "start_monitor",
       ),
+      "5": ('Spara alarm', 'save_alarms')
     }
 
     while True:
@@ -78,13 +94,14 @@ class Menu:
         "2. Ta bort alarm\n"
         "3. Lista alla konfigurerade alarm\n"
         "4. Skicka konfigurerade alarm till Monitoreringssystem\n"
-        "5. Avsluta Larm-konfigurationssystem program"
+        "5. Spara alarm\n"
+        "6. Avsluta Larm-konfigurationssystem program"
       )
       choice = self._read_input("Välj ett alternativ: ").strip()
 
-      if choice == "5":
-        self.save_alarms()
+      if choice == "6":
         print("Larm-konfigurationssystemet avslutas.")
+        self.log('session finished')
         return
 
       action = actions.get(choice)
@@ -93,9 +110,11 @@ class Menu:
         continue
 
       description, handler_name = action
+      self.log(f"user's choice: {description} ({handler_name})")
       handler = getattr(self, handler_name, None)
       if handler is None:
         print(f"Funktionen '{description}' är ännu inte implementerad.")
+        self.log('functionality is not ready yet')
         continue
 
       handler()
@@ -119,27 +138,35 @@ class Menu:
     return alarms
 
   def add_alarm(self):
+    self.log('Alarm configuration started')
     from alarm import Alarm
 
     alarm_type = self._read_input("Ange kategori (cpu, ram eller disk): ").strip()
     target_input = self._read_input("Ange nivå (heltal 0-100): ").strip()
+    self.log(f"user's choice type: {alarm_type}, target: {target_input}")
+
     try:
       target = int(target_input)
       alarm = Alarm(alarm_type, target)
+      self.log(f'alarm: {alarm} created')
     except ValueError as error:
       print(f"Alarmet kunde inte läggas till: {error}")
+      self.log(error)
       return
 
     self.alarms.append(alarm)
+    self.log('alarm saved')
     print(f"Alarm tillagt: {alarm}")
 
   def remove_alarm(self):
+    self.log('alarm removal started')
     sorted_alarms = sorted(
       self.alarms,
       key=lambda alarm: (alarm.type, alarm.target),
     )
     if not sorted_alarms:
       print("Det finns inga konfigurerade alarm att ta bort.")
+      self.log('there is no alarm in the system')
       return
 
     self._print_alarms(sorted_alarms)
@@ -151,10 +178,13 @@ class Menu:
 
     if index < 0 or index >= len(sorted_alarms):
       print("Alarmnumret finns inte.")
+      self.log('alarm does not exist')
       return
 
     alarm = sorted_alarms[index]
+    self.log(f'chosen alarm {alarm}')
     self.alarms.remove(alarm)
+    self.log(f'alarm {alarm} removed')
     print(f"Alarm borttaget: {alarm}")
 
   def list_alarms(self):
@@ -169,22 +199,61 @@ class Menu:
     self._print_alarms(sorted_alarms)
 
   def _print_alarms(self, alarms):
+    self.log('existing alarms')
     for index, alarm in enumerate(alarms, start=1):
       print(f"{index}. {alarm}")
+      self.log(f"{index}. {alarm}")
 
   def save_alarms(self):
+    self.log('alarm preservation')
     alarm_file = self._alarm_file_path()
     alarm_file.parent.mkdir(parents=True, exist_ok=True)
     contents = "\n".join(str(alarm) for alarm in self.alarms)
+    self.log(f'alarm list: {contents}')
     if contents:
       contents += "\n"
     alarm_file.write_text(contents, encoding="utf-8")
+    self.log('alarms saved')
     print("Alarmen har sparats till Monitoreringssystemet.")
 
   def start(self):
     self.non_interactive = bool(self.args)
+    self.log('session started')
     try:
       self.run()
-    except self.StartupChoicesExhausted:
+    except self.StartupChoicesExhausted as e:
       print("Startup-valen tog slut innan programmet avslutades.")
+      self.log(f'{e}')
       self.save_alarms()
+
+  def get_monitor(self) -> Monitor:
+    return Monitor(
+      self._alarm_file_path(),
+      self.logger
+    )
+
+  def get_monitoring_time(self) -> str:
+    return self._read_input(
+      'Ange övervakningstid i sekunder. Om ingen tid anges är övervakningen obegränsad.'
+    )
+
+  def start_monitor(self):
+    self.log('Monitoring started')
+    self.save_alarms()
+    monitor = self.get_monitor()
+    sec =self.get_monitoring_time()
+
+    try:
+      try:
+        time = int(sec)
+        self.log(f'monitoring time {time}')
+        monitor.startMonitor(time)
+      except:
+        self.log('infinity monitor')
+        monitor.startMonitor()
+    except KeyboardInterrupt:
+      print('Monitorering avlutades')
+      self.log('User has interrupted monitoring')
+      return
+    
+    self.log('Monitoring finished')
