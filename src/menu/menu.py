@@ -16,12 +16,13 @@ class Menu:
   def check(self):
     print('menu')
 
-# Implementera funktionella paradigm
-  def check_args(arg1, arg2):
-    return arg1 == arg2
-  
   def __init__(self):
     self.args = sys.argv[1:]
+
+  # Implementera pure function
+  @staticmethod
+  def check_args(arg1, arg2):
+    return arg1 == arg2 
 
   def run_args(self):
     # Make code to handle arguments
@@ -31,6 +32,7 @@ class Menu:
           raise ValueError(f"Expected 3 arguments, got {len(self.args)}")
 
         # Convert and validate every argument (must be an integer 1-3)
+        args = []
         for i, arg in enumerate(self.args[:3]):
             try:
                 number = int(arg)
@@ -38,20 +40,35 @@ class Menu:
                 raise ValueError(f"Argument {i + 1} ('{arg}') is not a number")
             if number not in (1, 2, 3):
                 raise ValueError(f"Argument {i + 1} is {number}, must be 1-3")
+            args.append(number)
 
-        if self.args[0] == 1:
+        if self.check_args(args[0], 1):
             # Start monitor
+            print("works here 1")
             pass
-        if self.args[1] == 2:
+        if self.check_args(args[1], 2):
             # Choose alarm to monitor (cpu, ram, disk)
+            print("works here 2")
             pass
-        if self.args[2] == 3:
+        if self.check_args(args[2], 3):
             # Choose monitor limit percentage
-            print("works here")
+            print("works here 3")
+            pass
 
     except ValueError as e:
         print(f"Invalid arguments: {e}")
-    
+  
+  def start(self):
+    if len(self.args) > 0:
+      self.run_args()
+    else:
+      self.non_interactive = bool(self.args)
+      try:
+        self.run()
+      except self.StartupChoicesExhausted:
+        print("Startup-valen tog slut innan programmet avslutades.")
+        self.save_alarms() 
+
   
   # Christians del
   class StartupChoicesExhausted(Exception):
@@ -186,14 +203,3 @@ class Menu:
     alarm_file.write_text(contents, encoding="utf-8")
     print("Alarmen har sparats till Monitoreringssystemet.")
 
-
-  def start(self):
-    if len(self.args) > 0:
-      self.run_args()
-    else:
-      self.non_interactive = bool(self.args)
-      try:
-        self.run()
-      except self.StartupChoicesExhausted:
-        print("Startup-valen tog slut innan programmet avslutades.")
-        self.save_alarms()
