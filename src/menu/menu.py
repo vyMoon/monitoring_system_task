@@ -15,6 +15,10 @@ import sys
 class Menu:
   def check(self):
     print('menu')
+
+# Implementera funktionella paradigm
+  def check_args(arg1, arg2):
+    return arg1 == arg2
   
   def __init__(self):
     self.args = sys.argv[1:]
