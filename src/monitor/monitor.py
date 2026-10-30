@@ -29,13 +29,13 @@ class Monitor:
   def __init__(
       self,
       alarm_path: Path,
-      log_path: Path = None,
+      logger: Logger = None,
       monitor_interval = 1,
       alarm_level = 0,
       warn_level = 10
     ):
     self.alarm_path = alarm_path
-    self.logger = Logger(log_path) if log_path else None
+    self.logger = logger
     self.monitor_interval = monitor_interval
     self.warn_level = warn_level
     self.alarm_level = alarm_level
